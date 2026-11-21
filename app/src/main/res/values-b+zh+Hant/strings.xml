@@ -1,0 +1,11 @@
+<resources>
+    <string name="module_summary">連接 USB 資料主機時，詢問是否為此次連線開啟 USB 偵錯；拔除連接線後自動關閉。</string>
+    <string name="dialog_title">開啟 USB 偵錯？</string>
+    <string name="dialog_message">已連接 USB 資料主機。是否為此次連線開啟 USB 偵錯？\n\n拔除 USB 連接線後將自動關閉。請僅允許你信任的裝置；系統仍可能要求確認 ADB RSA 授權。</string>
+    <string name="button_cancel">取消</string>
+    <string name="button_allow">開啟</string>
+    <string name="button_ok">知道了</string>
+    <string name="error_title">USB 偵錯操作失敗</string>
+    <string name="error_enable_failed">無法開啟 USB 偵錯，請檢查系統偵錯限制並查看模組記錄。</string>
+    <string name="error_disable_failed">無法關閉 USB 偵錯，請在開發人員選項中手動關閉並查看模組記錄。</string>
+</resources>

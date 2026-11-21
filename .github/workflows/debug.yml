@@ -1,0 +1,64 @@
+name: Debug
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: debug-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Test and build Debug
+        shell: bash
+        run: |
+          bash ./gradlew \
+            --no-daemon \
+            --no-configuration-cache \
+            testDebugUnitTest \
+            lintDebug \
+            assembleDebug
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: AutoADBXposed-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+      - name: Upload Debug reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: AutoADBXposed-debug-reports
+          path: |
+            app/build/reports/tests/testDebugUnitTest/
+            app/build/test-results/testDebugUnitTest/
+            app/build/reports/lint-results-debug.*
+          if-no-files-found: ignore
+          retention-days: 14

@@ -1,0 +1,11 @@
+<resources>
+    <string name="module_summary">连接 USB 数据主机时，询问是否为本次连接开启 USB 调试；拔线后自动关闭。</string>
+    <string name="dialog_title">开启 USB 调试？</string>
+    <string name="dialog_message">已连接 USB 数据主机。是否为本次连接开启 USB 调试？\n\n拔下 USB 后将自动关闭。请仅允许你信任的设备；系统仍可能要求确认 ADB RSA 授权。</string>
+    <string name="button_cancel">取消</string>
+    <string name="button_allow">开启</string>
+    <string name="button_ok">知道了</string>
+    <string name="error_title">USB 调试操作失败</string>
+    <string name="error_enable_failed">无法开启 USB 调试，请检查系统调试限制并查看模块日志。</string>
+    <string name="error_disable_failed">无法关闭 USB 调试，请在开发者选项中手动关闭并查看模块日志。</string>
+</resources>

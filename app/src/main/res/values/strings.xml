@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name" translatable="false">AutoADBXposed</string>
+    <string name="module_summary">Ask before enabling USB debugging for a USB data connection; automatically disable it when disconnected.</string>
+    <string name="dialog_title">Enable USB debugging?</string>
+    <string name="dialog_message">A USB data host is connected. Enable USB debugging for this connection?\n\nUSB debugging will turn off automatically when you unplug the cable. Only allow devices you trust. Android may also ask you to approve the host RSA key for ADB.</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="button_allow">Enable</string>
+    <string name="button_ok">OK</string>
+    <string name="error_title">USB debugging error</string>
+    <string name="error_enable_failed">Unable to enable USB debugging. Check system debugging restrictions and the module logs.</string>
+    <string name="error_disable_failed">Unable to disable USB debugging. Turn it off manually in Developer options and check the module logs.</string>
+</resources>

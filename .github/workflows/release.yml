@@ -1,0 +1,83 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event.release.id }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ github.event.release.tag_name }}
+          persist-credentials: false
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Test and build signed Release
+        shell: bash
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          trap 'rm -f .signing/autoadb-release.p12' EXIT
+          : "${RELEASE_KEYSTORE_BASE64:?Missing RELEASE_KEYSTORE_BASE64}"
+          : "${RELEASE_STORE_PASSWORD:?Missing RELEASE_STORE_PASSWORD}"
+          : "${RELEASE_KEY_PASSWORD:?Missing RELEASE_KEY_PASSWORD}"
+
+          umask 077
+          mkdir -p .signing
+          printf '%s' "$RELEASE_KEYSTORE_BASE64" | tr -d '\r\n' | base64 --decode \
+            > .signing/autoadb-release.p12
+          unset RELEASE_KEYSTORE_BASE64
+
+          bash ./gradlew \
+            --no-daemon \
+            --no-configuration-cache \
+            testDebugUnitTest \
+            lintRelease \
+            assembleRelease
+
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify \
+            app/build/outputs/apk/release/app-release.apk
+
+      - name: Upload Release artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: AutoADBXposed-release
+          path: |
+            app/build/outputs/apk/release/app-release.apk
+            app/build/outputs/mapping/release/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+      - name: Upload Release reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: AutoADBXposed-release-reports
+          path: |
+            app/build/reports/tests/testDebugUnitTest/
+            app/build/test-results/testDebugUnitTest/
+            app/build/reports/lint-results-release.*
+          if-no-files-found: ignore
+          retention-days: 14
