@@ -1,14 +1,14 @@
 name: Release
 
 on:
-  release:
-    types: [published]
+  push:
+    tags: ['v*']
 
 permissions:
   contents: write
 
 concurrency:
-  group: release-${{ github.event.release.id }}
+  group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -19,7 +19,6 @@ jobs:
       - name: Checkout release tag
         uses: actions/checkout@v7
         with:
-          ref: refs/tags/${{ github.event.release.tag_name }}
           persist-credentials: false
 
       - name: Set up Java
@@ -59,17 +58,19 @@ jobs:
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify \
             app/build/outputs/apk/release/app-release.apk
 
-      - name: Publish Release assets
+      - name: Create GitHub Release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          gh release upload "$RELEASE_TAG" \
+          gh release create "$RELEASE_TAG" \
             app/build/outputs/apk/release/app-release.apk \
             app/build/outputs/mapping/release/mapping.txt \
-            --clobber
+            --verify-tag \
+            --title "AutoADB ${RELEASE_TAG#v}" \
+            --generate-notes
 
       - name: Upload Release artifacts
         uses: actions/upload-artifact@v7
