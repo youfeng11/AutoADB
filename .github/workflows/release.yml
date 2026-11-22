@@ -5,7 +5,7 @@ on:
     types: [published]
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: release-${{ github.event.release.id }}
@@ -58,6 +58,18 @@ jobs:
 
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify \
             app/build/outputs/apk/release/app-release.apk
+
+      - name: Publish Release assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          gh release upload "$RELEASE_TAG" \
+            app/build/outputs/apk/release/app-release.apk \
+            app/build/outputs/mapping/release/mapping.txt \
+            --clobber
 
       - name: Upload Release artifacts
         uses: actions/upload-artifact@v7
