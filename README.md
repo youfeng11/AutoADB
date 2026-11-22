@@ -1,4 +1,4 @@
-# AutoADBXposed
+# AutoADB
 
 一个简单的Xposed模块，让手机连接 USB 数据主机时询问是否开启 USB 调试。仅对本次连接有效，拔线后自动关闭。
 
